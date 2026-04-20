@@ -1,31 +1,64 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="assets/style.css">
+﻿<!DOCTYPE html>
+<html lang="he">
+	<head>
+	<meta charset="UTF-8">
+	<title>Dashboard</title>
+	<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-
-<h1>Dashboard</h1>
-
-<div id="balanceBox"></div>
-<div id="summaryBox"></div>
-<div id="goalBox"></div>
-
-<h3>Recent Transactions</h3>
-<table border="1" id="transactionsTable">
-  <tr>
-    <th>Date</th>
-    <th>Type</th>
-    <th>Category</th>
-    <th>Amount</th>
-  </tr>
-</table>
-
-<script src="assets/script.js"></script>
-<script>
-loadDashboard();
-</script>
-
+	<h1>Dashboard</h1>
+	
+	<div id="balanceBox"></div>
+	<div id="summaryBox"></div>
+	<div id="goalBox"></div>
+	
+	<h3>Recent Transactions</h3>
+	<table border="1" id="transactionsTable">
+	  <tr>
+	    <th>Date</th>
+	    <th>Type</th>
+	    <th>Category</th>
+	    <th>Amount</th>
+	  </tr>
+	</table>
+	
+	<h3>הוסף עסקה</h3>
+	
+	<select id="txType">
+		<option value="income">הכנסה</option>
+		<option value="expense">הוצאה</option>
+	</select>
+	
+	<input id="txAmount" type="number" placeholder="סכום">
+	<input id="txDate" type="date">
+	<input id="txDesc" placeholder="תיאור (אופציונלי)">
+	
+	<select id="txCategory">
+		<option value="1">Salary</option>
+		<option value="2">Freelance</option>
+		<option value="3">Food</option>
+		<option value="4">Transport</option>
+		<option value="5">Entertainment</option>
+	</select>
+	
+	<button onclick="addTransaction()">הוסף</button>
+	
+	<script src="assets/script.js"></script>
+	<script>
+	loadDashboard();
+	</script>
+	
+	<h3>קבע תקציב חודשי</h3>
+	
+	<select id="budgetCategory">
+		<option value="3">Food</option>
+		<option value="4">Transport</option>
+		<option value="5">Entertainment</option>
+	</select>
+	
+	<input id="budgetLimit" type="number" placeholder="מגבלה חודשית (₪)">
+	
+		<button onclick="saveBudget()">שמור תקציב</button>
+		
 </body>
 </html>

@@ -1,24 +1,23 @@
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
+﻿<!DOCTYPE html>
+<html lang="he">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Login – Personal Budget</title>
+		<link rel="stylesheet" href="assets/style.css">
+	</head>
+	<body>
 
-<script>
-function login() {
-  fetch('api/login.php', {
-    method: 'POST',
-    body: JSON.stringify({
-      email: email.value,
-      password: password.value
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.user_id) {
-      localStorage.setItem("user_id", data.user_id);
-      window.location = "dashboard.html";
-    } else {
-      alert("Login failed");
-    }
-  });
-}
-</script>
+		<div class="container">
+			<h2>התחברות</h2>
+			<input id="email" type="email" placeholder="אימייל">
+				<input id="password" type="password" placeholder="סיסמה">
+					<button onclick="login()">התחבר</button>
+					<p>
+						אין לך חשבון? <a href="register.html">הירשם כאן</a>
+					</p>
+				</div>
+
+		<script src="assets/script.js"></script>
+	</body>
+</html>
