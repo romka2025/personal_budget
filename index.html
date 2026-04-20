@@ -1,0 +1,24 @@
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<script>
+function login() {
+  fetch('api/login.php', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: email.value,
+      password: password.value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.user_id) {
+      localStorage.setItem("user_id", data.user_id);
+      window.location = "dashboard.html";
+    } else {
+      alert("Login failed");
+    }
+  });
+}
+</script>
