@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <h1>ניהול</h1>
+        <div>
+            <a href="dashboard.html">חזרה ל-Dashboard</a>
+            <a href="transactions.html">כל התנועות</a>
+            <button onclick="logout()" class="btn-danger">התנתק</button>
+        </div>
+    </header>
+
+    <section>
+        <h3>ניהול יעדים</h3>
+        <div id="goalsList"></div>
+
+        <h4>הוסף יעד</h4>
+        <input  id="goalDesc"     type="text"   placeholder="תיאור היעד (אופציונלי)">
+        <input  id="goalAmount"   type="number" step="0.01" placeholder="סכום יעד (₪)">
+        <input  id="goalDeadline" type="date">
+        <button onclick="addGoal()">הוסף יעד</button>
+    </section>
+
+    <section>
+        <h3>ניהול תקציבים</h3>
+        <div id="budgetsList"></div>
+
+        <h4>הוסף / עדכן תקציב</h4>
+        <select id="budgetCategory"></select>
+        <input  id="budgetLimit" type="number" step="0.01" placeholder="מגבלה חודשית (₪)">
+        <button onclick="saveBudget()">שמור תקציב</button>
+    </section>
+
+    <section>
+        <h3>ניהול קטגוריות</h3>
+        <div id="categoriesList"></div>
+
+        <h4>הוסף קטגוריה</h4>
+        <input  id="catName" type="text" placeholder="שם הקטגוריה">
+        <select id="catType">
+            <option value="expense">הוצאה</option>
+            <option value="income">הכנסה</option>
+        </select>
+        <button onclick="addCategory()">הוסף קטגוריה</button>
+    </section>
+
+    <script src="assets/script.js"></script>
+    <script>initManagePage();</script>
+</body>
+</html>

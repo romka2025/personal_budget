@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>Transactions</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <h1>כל התנועות</h1>
+        <div>
+            <a href="dashboard.html">חזרה ל-Dashboard</a>
+            <a href="manage.html">ניהול</a>
+            <button onclick="logout()" class="btn-danger">התנתק</button>
+        </div>
+    </header>
+
+    <section>
+        <h3>סינון</h3>
+        <label>סוג:
+            <select id="filterType">
+                <option value="">הכל</option>
+                <option value="income">הכנסה</option>
+                <option value="expense">הוצאה</option>
+            </select>
+        </label>
+        <label>קטגוריה:
+            <select id="filterCategory">
+                <option value="">הכל</option>
+            </select>
+        </label>
+        <label>מתאריך: <input id="filterFrom" type="date"></label>
+        <label>עד תאריך: <input id="filterTo"   type="date"></label>
+        <label>חיפוש בתיאור: <input id="filterSearch" type="text" placeholder="טקסט..."></label>
+        <button onclick="applyTransactionFilters()">החל</button>
+        <button onclick="resetTransactionFilters()">נקה</button>
+    </section>
+
+    <section>
+        <table border="1" id="transactionsTable">
+            <tr>
+                <th>תאריך</th>
+                <th>סוג</th>
+                <th>קטגוריה</th>
+                <th>סכום</th>
+                <th>תיאור</th>
+                <th></th>
+            </tr>
+        </table>
+        <p id="txEmpty" style="display:none;">אין תנועות התואמות לסינון.</p>
+    </section>
+
+    <script src="assets/script.js"></script>
+    <script>initTransactionsPage();</script>
+</body>
+</html>
