@@ -153,3 +153,64 @@ table th { background: #f0f2f5; }
 .edit-row input {
     margin: 0;
 }
+
+/* Balance box */
+.balance-sub {
+    color: #666;
+    font-size: 13px;
+    margin: 2px 0;
+}
+
+.balance-allocated {
+    color: #1565C0;
+    font-size: 13px;
+    margin: 2px 0;
+}
+
+/* Allocation row inside a goal */
+.alloc-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding: 8px;
+    background: #f0f7ff;
+    border-radius: 8px;
+}
+
+.alloc-row label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1565C0;
+}
+
+.alloc-hint {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Realized goal */
+.goal-realized {
+    opacity: 0.65;
+}
+
+.badge-realized {
+    display: inline-block;
+    background: #4CAF50;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-inline-start: 6px;
+}
+
+button.btn-success {
+    background: #1565C0;
+}
+
+button.btn-success:hover {
+    background: #0d47a1;
+}

@@ -197,9 +197,13 @@ function loadBalance(userId) {
         .then(data => {
             const box = document.getElementById("balanceBox");
             if (!box) return;
+            const allocLine = data.total_allocated > 0
+                ? `<p class="balance-allocated">מוקצה לחסכונות: ${fmtMoney(data.total_allocated)}</p>`
+                : "";
             box.innerHTML = `
-                <h2>יתרה: ${fmtMoney(data.balance)}</h2>
-                <p>הכנסות: ${fmtMoney(data.income)} | הוצאות: ${fmtMoney(data.expense)}</p>
+                <h2>יתרה חופשית: ${fmtMoney(data.free_balance)}</h2>
+                <p class="balance-sub">יתרה כוללת: ${fmtMoney(data.balance)} &nbsp;|&nbsp; הכנסות: ${fmtMoney(data.income)} &nbsp;|&nbsp; הוצאות: ${fmtMoney(data.expense)}</p>
+                ${allocLine}
             `;
         })
         .catch(err => console.error(err));
@@ -336,49 +340,80 @@ function loadGoals(userId, editable) {
             const box = document.getElementById("goalsList");
             if (!box) return;
 
-            const totalIncome = data.total_income || 0;
+            const freeBalance = data.free_balance || 0;
             const goals       = data.goals || [];
 
             if (goals.length === 0) {
-                box.innerHTML = "<p>אין יעדים עדיין.</p>";
+                box.innerHTML = "<p>אין חסכונות עדיין.</p>";
                 return;
             }
 
             box.innerHTML = goals.map(g => editable
-                ? renderGoalEditable(g, totalIncome)
-                : renderGoalReadOnly(g, totalIncome)
+                ? renderGoalEditable(g, freeBalance)
+                : renderGoalReadOnly(g)
             ).join("");
         })
         .catch(err => console.error("goals error:", err));
 }
 
-function renderGoalReadOnly(g, totalIncome) {
-    const target  = g.target_amount;
-    const percent = target > 0 ? Math.min((totalIncome / target) * 100, 100) : 0;
-    const dl      = g.deadline ? `עד ${g.deadline}` : "ללא תאריך יעד";
-    const desc    = g.description ? `<div class="goal-desc">${escapeHtml(g.description)}</div>` : "";
+function renderGoalReadOnly(g) {
+    const target    = g.target_amount;
+    const allocated = g.allocated_amount;
+    const percent   = target > 0 ? Math.min((allocated / target) * 100, 100) : 0;
+    const dl        = g.deadline ? `עד ${g.deadline}` : "ללא תאריך יעד";
+    const desc      = g.description ? `<strong>${escapeHtml(g.description)}</strong>` : "<strong>חסכון</strong>";
+    const realized  = g.status === "realized";
+
+    if (realized) {
+        return `
+            <div class="goal-item goal-realized">
+                ${desc} <span class="badge-realized">✓ מומש</span>
+                <p style="color:#888;">יעד: ${fmtMoney(target)} (${dl})</p>
+            </div>
+        `;
+    }
+
     return `
         <div class="goal-item">
-            <strong>יעד: ${fmtMoney(target)}</strong> (${dl})
-            ${desc}
+            ${desc} — יעד: ${fmtMoney(target)} (${dl})
             <div class="bar-bg">
                 <div class="bar-fill" style="width:${percent}%;"></div>
             </div>
-            <p>${percent.toFixed(1)}% (${fmtMoney(totalIncome)} מתוך ${fmtMoney(target)})</p>
+            <p>הוקצה: ${fmtMoney(allocated)} מתוך ${fmtMoney(target)} (${percent.toFixed(1)}%)</p>
         </div>
     `;
 }
 
-function renderGoalEditable(g, totalIncome) {
-    const target   = g.target_amount;
-    const percent  = target > 0 ? Math.min((totalIncome / target) * 100, 100) : 0;
-    const descVal  = g.description || "";
-    const dlVal    = g.deadline    || "";
+function renderGoalEditable(g, freeBalance) {
+    const target    = g.target_amount;
+    const allocated = g.allocated_amount;
+    const percent   = target > 0 ? Math.min((allocated / target) * 100, 100) : 0;
+    const descVal   = g.description || "";
+    const dlVal     = g.deadline    || "";
+    const realized  = g.status === "realized";
+
+    if (realized) {
+        return `
+            <div class="goal-item goal-realized">
+                <div class="edit-row">
+                    <strong>${escapeHtml(descVal) || "חסכון"}</strong>
+                    <span class="badge-realized">✓ מומש</span>
+                    <button class="btn-danger" onclick="deleteGoal(${g.goal_id})">מחק</button>
+                </div>
+                <p style="color:#888;">יעד: ${fmtMoney(target)} (${dlVal || "ללא תאריך"})</p>
+            </div>
+        `;
+    }
+
+    // Available to add = freeBalance (already excludes this goal's allocation)
+    // To show max the user can set: freeBalance + current allocated
+    const maxAlloc = freeBalance + allocated;
+
     return `
         <div class="goal-item">
             <div class="edit-row">
-                <input type="text"   id="goalDesc_${g.goal_id}"     value="${escapeAttr(descVal)}" placeholder="תיאור">
-                <input type="number" id="goalAmount_${g.goal_id}"   value="${target}" step="0.01" placeholder="סכום">
+                <input type="text"   id="goalDesc_${g.goal_id}"     value="${escapeAttr(descVal)}" placeholder="תיאור החסכון">
+                <input type="number" id="goalAmount_${g.goal_id}"   value="${target}" step="0.01" min="0.01" placeholder="סכום יעד">
                 <input type="date"   id="goalDeadline_${g.goal_id}" value="${escapeAttr(dlVal)}">
                 <button onclick="updateGoal(${g.goal_id})">שמור</button>
                 <button class="btn-danger" onclick="deleteGoal(${g.goal_id})">מחק</button>
@@ -386,7 +421,14 @@ function renderGoalEditable(g, totalIncome) {
             <div class="bar-bg">
                 <div class="bar-fill" style="width:${percent}%;"></div>
             </div>
-            <p>${percent.toFixed(1)}% (${fmtMoney(totalIncome)} מתוך ${fmtMoney(target)})</p>
+            <p>הוקצה: ${fmtMoney(allocated)} מתוך ${fmtMoney(target)} (${percent.toFixed(1)}%)</p>
+            <div class="alloc-row">
+                <label>הקצאה לחסכון זה:</label>
+                <input type="number" id="goalAlloc_${g.goal_id}" value="${allocated}" step="0.01" min="0" max="${maxAlloc}" placeholder="סכום להקצאה">
+                <button onclick="allocateGoal(${g.goal_id})">עדכן הקצאה</button>
+                <button class="btn-success" onclick="realizeGoal(${g.goal_id})">✓ ממש חסכון</button>
+            </div>
+            <small class="alloc-hint">יתרה חופשית זמינה: ${fmtMoney(freeBalance)} (מקסימום אפשרי לחסכון זה: ${fmtMoney(maxAlloc)})</small>
         </div>
     `;
 }
@@ -458,10 +500,59 @@ function updateGoal(goalId) {
     });
 }
 
+function allocateGoal(goalId) {
+    const userId = requireLogin();
+    if (!userId) return;
+
+    const input = document.getElementById("goalAlloc_" + goalId);
+    const newAmount = parseFloat(input ? input.value : "");
+
+    if (isNaN(newAmount) || newAmount < 0) {
+        alert("נא להזין סכום תקין (0 או יותר)");
+        return;
+    }
+
+    fetch(`${API}/allocate_goal.php`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ user_id: userId, goal_id: goalId, new_amount: newAmount })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            loadBalance(userId);
+            loadGoals(userId, true);
+        } else {
+            alert("שגיאה בהקצאה: " + (data.error || ""));
+        }
+    });
+}
+
+function realizeGoal(goalId) {
+    const userId = requireLogin();
+    if (!userId) return;
+    if (!confirm("לסמן את החסכון כמומש? הכסף יחזור ליתרה החופשית.")) return;
+
+    fetch(`${API}/realize_goal.php`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ user_id: userId, goal_id: goalId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            loadBalance(userId);
+            loadGoals(userId, true);
+        } else {
+            alert("שגיאה: " + (data.error || ""));
+        }
+    });
+}
+
 function deleteGoal(goalId) {
     const userId = requireLogin();
     if (!userId) return;
-    if (!confirm("למחוק את היעד?")) return;
+    if (!confirm("למחוק את החסכון?")) return;
 
     fetch(`${API}/delete_goal.php`, {
         method:  "POST",
@@ -470,8 +561,11 @@ function deleteGoal(goalId) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) loadGoals(userId, true);
-        else alert("שגיאה במחיקת יעד: " + (data.error || ""));
+        if (data.success) {
+            loadBalance(userId);
+            loadGoals(userId, true);
+        }
+        else alert("שגיאה במחיקת חסכון: " + (data.error || ""));
     });
 }
 
