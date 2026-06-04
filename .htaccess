@@ -8,8 +8,9 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Block access to config directory
+    # Block access to config and sql directories
     RewriteRule ^config(/.*)?$ - [F,L]
+    RewriteRule ^sql(/.*)?$ - [F,L]
 
     # Block access to .sql files
     RewriteRule \.sql$ - [F,L]
