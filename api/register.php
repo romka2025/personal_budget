@@ -1,4 +1,5 @@
 <?php
+require_once "../config/security.php";
 header("Content-Type: application/json");
 include("../config/db.php");
 
@@ -6,24 +7,24 @@ $raw  = file_get_contents("php://input");
 $data = json_decode($raw);
 
 if (!$data || !isset($data->name, $data->email, $data->password)) {
-    echo json_encode(["error" => "Missing fields"]);
+    echo safe_json(["error" => "Missing fields"]);
     exit;
 }
 
-$name     = trim($data->name);
-$email    = trim($data->email);
-$password = $data->password;
+$name     = sanitize_input($data->name);
+$email    = sanitize_input($data->email);
+$password = $data->password; // לא מנוקה — נשמר כ-hash בלבד
 
 if ($name === "" || $email === "" || $password === "") {
-    echo json_encode(["error" => "All fields are required"]);
+    echo safe_json(["error" => "All fields are required"]);
     exit;
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(["error" => "Invalid email"]);
+    echo safe_json(["error" => "Invalid email"]);
     exit;
 }
-if (strlen($password) < 4) {
-    echo json_encode(["error" => "Password too short"]);
+if (strlen($password) < 6) {
+    echo safe_json(["error" => "Password too short (minimum 6 characters)"]);
     exit;
 }
 
@@ -32,11 +33,13 @@ $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
 $check->bind_param("s", $email);
 $check->execute();
 if ($check->get_result()->fetch_assoc()) {
-    echo json_encode(["error" => "Email already registered"]);
+    echo safe_json(["error" => "Email already registered"]);
     exit;
 }
 
-$hash = password_hash($password, PASSWORD_DEFAULT);
+// bcrypt עם cost=12 — מאזן בין אבטחה לביצועים.
+// cost גבוה יותר = hashing איטי יותר = קשה יותר לתוקף ל-brute force.
+$hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
 $conn->begin_transaction();
 
@@ -72,7 +75,7 @@ try {
 
     $conn->commit();
 
-    echo json_encode([
+    echo safe_json([
         "success" => true,
         "user_id" => $new_user_id,
         "name"    => $name
@@ -80,6 +83,6 @@ try {
 
 } catch (Exception $e) {
     $conn->rollback();
-    echo json_encode(["error" => $e->getMessage()]);
+    echo safe_json(["error" => $e->getMessage()]);
 }
 ?>

@@ -1,0 +1,2 @@
+# Block ALL direct HTTP access to logs
+Require all denied

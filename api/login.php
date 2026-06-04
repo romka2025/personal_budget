@@ -1,59 +1,85 @@
 <?php
+require_once "../config/security.php";
 header("Content-Type: application/json");
 include("../config/db.php");
 
+// ── Rate limiting: חסום אם ה-IP ביצע יותר מדי כישלונות ──────────────────────
+if (is_ip_locked_out()) {
+    http_response_code(429);
+    echo safe_json(["error" => "יותר מדי ניסיונות כושלים. נסה שוב בעוד 15 דקות."]);
+    exit;
+}
+
+// ── קלט ───────────────────────────────────────────────────────────────────────
 $raw  = file_get_contents("php://input");
 $data = json_decode($raw);
 
 if (!$data || !isset($data->email) || !isset($data->password)) {
-    echo json_encode(["error" => "Invalid input"]);
+    echo safe_json(["error" => "Invalid input"]);
     exit;
 }
 
-$email    = $data->email;
-$password = $data->password;
+$email    = sanitize_input($data->email);
+$password = $data->password; // לא מנוקה — password_verify צריך את הערך המקורי
 
-$sql  = "SELECT user_id, name, password FROM users WHERE email = ?";
-$stmt = $conn->prepare($sql);
-
+// ── שליפת משתמש (Prepared Statement → מניעת SQL Injection) ───────────────────
+$stmt = $conn->prepare("SELECT user_id, name, password FROM users WHERE email = ?");
 if (!$stmt) {
-    echo json_encode(["error" => "DB prepare failed"]);
+    echo safe_json(["error" => "DB prepare failed"]);
     exit;
 }
-
 $stmt->bind_param("s", $email);
 $stmt->execute();
+$user = $stmt->get_result()->fetch_assoc();
 
-$result = $stmt->get_result();
-$user   = $result->fetch_assoc();
+// ── אימות סיסמה ───────────────────────────────────────────────────────────────
+$ok = false;
 
-if (!$user) {
-    echo json_encode(["error" => "Invalid email or password"]);
-    exit;
+if ($user) {
+    $stored = $user['password'];
+
+    if (password_verify($password, $stored)) {
+        $ok = true;
+
+        // אם ה-hash ישן (cost נמוך מ-12) — שדרג אוטומטית
+        if (password_needs_rehash($stored, PASSWORD_BCRYPT, ['cost' => 12])) {
+            $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+            $upd = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+            $upd->bind_param("si", $newHash, $user['user_id']);
+            $upd->execute();
+        }
+
+    } elseif (hash_equals($stored, $password)) {
+        // משתמש seed עם סיסמה plain-text — כנס ושדרג ל-bcrypt
+        $ok      = true;
+        $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+        $upd     = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+        $upd->bind_param("si", $newHash, $user['user_id']);
+        $upd->execute();
+    }
 }
 
-// Accept either a bcrypt hash (from register.php) or a legacy plain-text
-// password (from the original seed data). Both paths succeed silently.
-$stored = $user['password'];
-$ok     = false;
-
-if (password_verify($password, $stored)) {
-    $ok = true;
-} elseif (hash_equals($stored, $password)) {
-    // Legacy plain-text seed user — log in and silently upgrade to a hash.
-    $ok      = true;
-    $newHash = password_hash($password, PASSWORD_DEFAULT);
-    $upd     = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
-    $upd->bind_param("si", $newHash, $user['user_id']);
-    $upd->execute();
-}
-
+// ── תגובה ────────────────────────────────────────────────────────────────────
 if ($ok) {
-    echo json_encode([
+    // Session מאובטח — regenerate ID למניעת Session Fixation
+    start_secure_session();
+    session_regenerate_id(true);
+
+    $_SESSION['user_id']     = $user['user_id'];
+    $_SESSION['_created']    = time();
+    $_SESSION['fingerprint'] = hash('sha256',
+        ($_SERVER['HTTP_USER_AGENT']      ?? '') .
+        ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '')
+    );
+
+    echo safe_json([
         "user_id" => $user['user_id'],
         "name"    => $user['name']
     ]);
+
 } else {
-    echo json_encode(["error" => "Invalid email or password"]);
+    log_failed_login($email ?? 'unknown');
+    http_response_code(401);
+    echo safe_json(["error" => "אימייל או סיסמה שגויים"]);
 }
 ?>
