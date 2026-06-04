@@ -1,0 +1,37 @@
+# ========================================
+# Security - Block sensitive files & dirs
+# ========================================
+
+Options -Indexes
+
+# Block direct access to config folder
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block access to config directory
+    RewriteRule ^config(/.*)?$ - [F,L]
+
+    # Block access to .sql files
+    RewriteRule \.sql$ - [F,L]
+
+    # Block access to .log files
+    RewriteRule \.log$ - [F,L]
+</IfModule>
+
+# Block access to sensitive file types
+<FilesMatch "\.(sql|log|sh|env|bak|backup|ini|htpasswd)$">
+    Require all denied
+</FilesMatch>
+
+# Block access to hidden files (dot files) except .htaccess itself
+<FilesMatch "^\.(?!htaccess)">
+    Require all denied
+</FilesMatch>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

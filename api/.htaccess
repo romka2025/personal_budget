@@ -1,0 +1,10 @@
+# API directory - allow only GET/POST requests, block direct browser access to PHP files
+<FilesMatch "\.php$">
+    # Allow access only via HTTP methods used by the frontend
+    <LimitExcept GET POST OPTIONS>
+        Require all denied
+    </LimitExcept>
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
