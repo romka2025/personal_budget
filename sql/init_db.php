@@ -61,6 +61,8 @@ function init_database(string $host, string $user, string $password, string $dbn
                 `category_id`    INT,
                 `date`           DATE            NOT NULL,
                 `description`    VARCHAR(255),
+                `is_storno`      TINYINT(1)      NOT NULL DEFAULT 0,
+                `storno_ref`     INT             DEFAULT NULL,
                 CONSTRAINT `fk_transaction_user`
                     FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE,
                 CONSTRAINT `fk_transaction_category`
@@ -117,6 +119,12 @@ function init_database(string $host, string $user, string $password, string $dbn
 
     _add_column_if_missing($conn, $dbname, "goals", "status",
         "ALTER TABLE `goals` ADD COLUMN `status` ENUM('active','realized') NOT NULL DEFAULT 'active' AFTER `deadline`");
+
+    _add_column_if_missing($conn, $dbname, "transactions", "is_storno",
+        "ALTER TABLE `transactions` ADD COLUMN `is_storno` TINYINT(1) NOT NULL DEFAULT 0");
+
+    _add_column_if_missing($conn, $dbname, "transactions", "storno_ref",
+        "ALTER TABLE `transactions` ADD COLUMN `storno_ref` INT DEFAULT NULL");
 
     // ── 5. נתוני זרע — רק אם הטבלאות ריקות ──────────────────────────────────
     $userCount = $conn->query("SELECT COUNT(*) AS c FROM `users`")->fetch_assoc()['c'];

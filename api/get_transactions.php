@@ -13,7 +13,7 @@ $sql = "SELECT t.transaction_id, t.date, t.type, t.amount, t.description,
                t.category_id, c.name AS category
         FROM transactions t
         LEFT JOIN categories c ON t.category_id = c.category_id
-        WHERE t.user_id = ?
+        WHERE t.user_id = ? AND t.is_storno = 0
         ORDER BY t.date DESC, t.transaction_id DESC";
 
 $stmt = $conn->prepare($sql);
