@@ -304,7 +304,7 @@ function addTransaction() {
 function deleteTransaction(transactionId) {
     const userId = requireLogin();
     if (!userId) return;
-    if (!confirm("למחוק את התנועה?")) return;
+    if (!confirm("לבטל את התנועה? (הפעולה תירשם כסטורנו)")) return;
 
     fetch(`${API}/delete_transaction.php`, {
         method:  "POST",
