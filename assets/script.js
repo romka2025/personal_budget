@@ -327,7 +327,8 @@ function deleteTransaction(transactionId) {
         } else {
             alert("שגיאה במחיקה: " + (data.error || ""));
         }
-    });
+    })
+    .catch(err => alert("שגיאת תקשורת: " + err));
 }
 
 // =========================

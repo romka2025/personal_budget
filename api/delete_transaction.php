@@ -42,7 +42,7 @@ $ins = $conn->prepare(
      VALUES (?, ?, ?, ?, CURDATE(), ?, 1, ?)"
 );
 $ins->bind_param(
-    "idsiisi",
+    "idsisi",
     $user_id,
     $orig['amount'],
     $reverse_type,
