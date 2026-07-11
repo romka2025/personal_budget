@@ -6,59 +6,115 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+    
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 
-    <header class="topbar">
-        <h1>Dashboard</h1>
-        <div>
-            <span id="welcomeMsg"></span>
-            <span id="todayDate"></span>
-            <a href="transactions.html">כל התנועות</a>
-            <a href="manage.html">ניהול</a>
-            <button onclick="logout()" class="btn-danger">התנתק</button>
+    <div class="app-wrapper">
+
+        <aside class="sidebar">
+            <h2>סרגל הניווט</h2>
+            <nav>
+                <a href="dashboard.html">בית</a>
+                <a href="transactions.html">כל התנועות</a>
+                <a href="manage.html">ניהול תקציבים ויעדים</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" onclick="toggleDarkMode()">🌙 מצב כהה</button>
+                <button onclick="logout()" class="btn-danger">התנתק</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+  
+        <div class="dashboard-greeting">
+        <h1 id="welcomeMsg">שלום, משתמש</h1>
+        <p id="todayDate">טוען תאריך...</p>
         </div>
-    </header>
+ 
 
-    <section>
-        <div id="balanceBox"></div>
-    </section>
+        <div class="cards-grid">
+    
+    <!-- כרטיסייה 1: הוצאות -->
+            <div class="summary-card">
+                <div class="card-icon expense-icon">📉</div>
+                <div class="card-content">
+                    <h4>הוצאות</h4>
+                    <p class="amount"><span id="expensesAmount">0</span></p>
+                    <span class="subtitle">סך כל ההוצאות</span>
+                </div>
+            </div>
 
-    <section>
-        <h3>הוסף תנועה</h3>
-        <select id="txType" onchange="onTxTypeChange()">
-            <option value="expense" selected>הוצאה</option>
-            <option value="income">הכנסה</option>
-        </select>
-        <input  id="txAmount" type="number" step="0.01" placeholder="סכום">
-        <input  id="txDate"   type="date">
-        <input  id="txDesc"                  placeholder="תיאור (אופציונלי)">
-        <select id="txCategory"></select>
-        <button onclick="addTransaction()">הוסף</button>
-    </section>
+    <!-- כרטיסייה 2: הכנסות -->
+            <div class="summary-card">
+                <div class="card-icon income-icon">📈</div>
+                <div class="card-content">
+                    <h4>הכנסות</h4>
+                    <p class="amount"><span id="incomesAmount">0</span></p>
+                    <span class="subtitle">סך כל ההכנסות</span>
+                </div>
+            </div>
 
-    <section>
-        <h3>תנועות אחרונות</h3>
-        <table border="1" id="transactionsTable">
-            <tr>
-                <th>תאריך</th>
-                <th>סוג</th>
-                <th>קטגוריה</th>
-                <th>סכום</th>
-                <th>תיאור</th>
-            </tr>
-        </table>
-    </section>
+    <!-- כרטיסייה 3: יתרה חופשית -->
+            <div class="summary-card">
+                <div class="card-icon balance-icon">💳</div>
+                <div class="card-content">
+                    <h4>יתרה חופשית</h4>
+                    <p class="amount"><span id="balanceAmount">0</span></p>
+                    <span class="subtitle">יתרה כוללת לחודש הנוכחי</span>
+                </div>
+            </div>
 
-    <section>
-        <h3>חסכונות</h3>
-        <div id="goalsList"></div>
-    </section>
+        </div>
+        
 
-    <section>
-        <h3>תקציבים חודשיים</h3>
-        <div id="budgetsList"></div>
-    </section>
+            <section class="add-tx-section">
+                <div class="section-header">
+                    <h3>הוסף תנועה</h3>
+                    <span class="subtitle">הוסף הכנסה או הוצאה חדשה</span>
+                </div>
+            
+                <div class="inline-form">
+                    <!-- סודר לפי הסדר בפיגמה (מימין לשמאל) -->
+                    <select id="txType" onchange="onTxTypeChange()">
+                        <option value="expense" selected>הוצאה</option>
+                        <option value="income">הכנסה</option>
+                    </select>
+                
+                    <input id="txDate" type="date">
+                
+                    <input id="txAmount" type="number" step="0.01" placeholder="סכום (₪)">
+                
+                    <select id="txCategory"></select>
+                
+                    <input id="txDesc" placeholder="תיאור (אופציונלי)">
+                
+                    <button class="btn-dark" onclick="addTransaction()">+ הוסף</button>
+                </div>
+            </section>
 
-    <script src="assets/script.js"></script>
-    <script>loadDashboard();</script>
+            <section>
+                <h3>תנועות אחרונות</h3>
+                <div id="transactionsTable"></div>
+            </section>
+
+            <section>
+                <h3>חסכונות</h3>
+                <div id="goalsList"></div>
+            </section>
+
+            <section>
+                <h3>תקציבים חודשיים</h3>
+                <div id="budgetsList"></div>
+            </section>
+
+        <script src="assets/script.js"></script>
+        <script>loadDashboard();</script>
+        
+        </main>
+    </div>
 </body>
 </html>

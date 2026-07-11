@@ -5,10 +5,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Login – Personal Budget</title>
 		<link rel="stylesheet" href="assets/style.css">
+		
 	</head>
 	<body>
+		<script>
+			if (localStorage.getItem('theme') === 'dark') {
+				document.body.classList.add('dark-mode');
+			}
+		</script>
+
+		
 
 		<div class="container">
+			<h1>ברוכים הבאים!</h1>
 			<h2>התחברות</h2>
 			<input id="email" type="email" placeholder="אימייל">
 				<input id="password" type="password" placeholder="סיסמה">
@@ -16,8 +25,10 @@
 					<p>
 						אין לך חשבון? <a href="register.html">הירשם כאן</a>
 					</p>
+					<button id="login-theme-btn" onclick="toggleDarkMode()" class="theme-btn">🌙</button>
 				</div>
 
 		<script src="assets/script.js"></script>
+		
 	</body>
 </html>

@@ -121,10 +121,10 @@ function loadDashboard() {
 
     const name = localStorage.getItem("user_name") || "משתמש";
     const welcome = document.getElementById("welcomeMsg");
-    if (welcome) welcome.textContent = "שלום, " + name + " | ";
+    if (welcome) welcome.textContent = "שלום, " + name 
 
     const dateEl = document.getElementById("todayDate");
-    if (dateEl) dateEl.textContent = todayHebrew() + " | ";
+    if (dateEl) dateEl.textContent = todayHebrew();
 
     // Default the "add transaction" date to today.
     const txDateInput = document.getElementById("txDate");
@@ -138,6 +138,7 @@ function loadDashboard() {
     loadTransactions(userId);
     loadGoals(userId,   /* editable */ false);
     loadBudgets(userId, /* editable */ false);
+    initThemeButton();
 }
 
 // =========================
@@ -152,6 +153,7 @@ function initManagePage() {
     loadGoals(userId,   /* editable */ true);
     loadBudgets(userId, /* editable */ true);
     loadCategories();
+    initThemeButton();
 }
 
 function onTxTypeChange() {
@@ -188,6 +190,7 @@ function populateCategorySelect(selectId, type) {
         .catch(err => console.error("categories error:", err));
 }
 
+
 // =========================
 // BALANCE
 // =========================
@@ -195,19 +198,17 @@ function loadBalance(userId) {
     fetch(`${API}/get_balance.php?user_id=${userId}`)
         .then(res => res.json())
         .then(data => {
-            const box = document.getElementById("balanceBox");
-            if (!box) return;
-            const allocLine = data.total_allocated > 0
-                ? `<p class="balance-allocated">מוקצה לחסכונות: ${fmtMoney(data.total_allocated)}</p>`
-                : "";
-            box.innerHTML = `
-                <h2>יתרה חופשית: ${fmtMoney(data.free_balance)}</h2>
-                <p class="balance-sub">יתרה כוללת: ${fmtMoney(data.balance)} &nbsp;|&nbsp; הכנסות: ${fmtMoney(data.income)} &nbsp;|&nbsp; הוצאות: ${fmtMoney(data.expense)}</p>
-                ${allocLine}
-            `;
+            const expensesAmount = document.getElementById("expensesAmount");
+            const incomesAmount = document.getElementById("incomesAmount");
+            const balanceAmount = document.getElementById("balanceAmount");
+
+            if (expensesAmount) expensesAmount.innerText = fmtMoney(data.expense);
+            if (incomesAmount) incomesAmount.innerText = fmtMoney(data.income);
+            if (balanceAmount) balanceAmount.innerText = fmtMoney(data.free_balance); 
         })
         .catch(err => console.error(err));
 }
+
 
 // =========================
 // TRANSACTIONS (dashboard table)
@@ -220,39 +221,67 @@ function loadTransactions(userId) {
 }
 
 function renderTransactionsTable(data, withDelete) {
-    const table = document.getElementById("transactionsTable");
-    if (!table) return;
+    const container = document.getElementById("transactionsTable");
+    if (!container) return;
 
-    const headExtra = withDelete ? "<th></th>" : "";
-    table.innerHTML = `
-        <tr>
-            <th>תאריך</th>
-            <th>סוג</th>
-            <th>קטגוריה</th>
-            <th>סכום</th>
-            <th>תיאור</th>
-            ${headExtra}
-        </tr>
-    `;
+    // אם אנחנו בדאשבורד (withDelete = false), נציג רק 5 תנועות אחרונות לפי העיצוב בפיגמה
+    const displayData = withDelete ? data : data.slice(0, 5);
 
-    data.forEach(t => {
-        const row = table.insertRow();
+    if (displayData.length === 0) {
+        container.innerHTML = "<p>אין תנועות עדיין.</p>";
+        return;
+    }
+
+    let html = '<div class="transactions-list">';
+    
+    displayData.forEach(t => {
+        const isIncome = t.type === 'income';
+        
+        // הגדרות עיצוב לפי סוג התנועה
+        const iconClass = isIncome ? 'icon-income' : 'icon-expense';
+        const iconSymbol = isIncome ? '↗' : '↘'; // חצים כמו בעיצוב
+        const sign = isIncome ? '+' : '-';
+        const amountColor = isIncome ? 'text-green' : 'text-red';
+        
+        // סידור התאריך לפורמט ישראלי (DD/MM/YYYY)
+        const dateParts = t.date.split('-');
+        const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : t.date;
+        
+        // כותרת - אם אין תיאור, נציג את שם הקטגוריה
+        const title = t.description ? escapeHtml(t.description) : escapeHtml(t.category || 'תנועה');
+        const categoryName = escapeHtml(t.category || 'כללי');
+
+        // כפתור מחיקה (יוצג רק בעמוד כל התנועות, לא בדאשבורד)
         const actionCell = withDelete
-            ? `<td><button class="btn-danger" onclick="deleteTransaction(${t.transaction_id})">מחק</button></td>`
+            ? `<button class="btn-delete-icon" onclick="deleteTransaction(${t.transaction_id})" title="מחק תנועה">🗑️</button>`
             : "";
-        row.innerHTML = `
-            <td>${t.date}</td>
-            <td>${t.type === 'income' ? 'הכנסה' : 'הוצאה'}</td>
-            <td>${escapeHtml(t.category || '—')}</td>
-            <td>${fmtMoney(t.amount)}</td>
-            <td>${escapeHtml(t.description || '')}</td>
-            ${actionCell}
+
+        // בניית השורה
+        html += `
+            <div class="transaction-item">
+                <div class="tx-right">
+                    <div class="tx-icon ${iconClass}">${iconSymbol}</div>
+                    <div class="tx-details">
+                        <span class="tx-title">${title}</span>
+                        <span class="tx-subtitle">${categoryName} • ${formattedDate}</span>
+                    </div>
+                </div>
+                <div class="tx-left">
+                    <span class="tx-amount ${amountColor}" dir="ltr">${sign}${fmtMoney(t.amount)}</span>
+                    ${actionCell}
+                </div>
+            </div>
         `;
     });
+    
+    html += '</div>';
+    container.innerHTML = html;
 
+    // הסתרת הודעת ה"ריק" אם קיימת ב-HTML
     const empty = document.getElementById("txEmpty");
-    if (empty) empty.style.display = data.length === 0 ? "" : "none";
+    if (empty) empty.style.display = "none";
 }
+
 
 function addTransaction() {
     const userId = requireLogin();
@@ -304,7 +333,7 @@ function addTransaction() {
 function deleteTransaction(transactionId) {
     const userId = requireLogin();
     if (!userId) return;
-    if (!confirm("לבטל את התנועה? (הפעולה תירשם כסטורנו)")) return;
+    if (!confirm("למחוק את התנועה?")) return;
 
     fetch(`${API}/delete_transaction.php`, {
         method:  "POST",
@@ -327,8 +356,7 @@ function deleteTransaction(transactionId) {
         } else {
             alert("שגיאה במחיקה: " + (data.error || ""));
         }
-    })
-    .catch(err => alert("שגיאת תקשורת: " + err));
+    });
 }
 
 // =========================
@@ -842,6 +870,7 @@ function initTransactionsPage() {
             _allTransactions = data;
             renderTransactionsTable(data, true);
         });
+    initThemeButton();    
 }
 
 function applyTransactionFilters() {
@@ -885,4 +914,45 @@ function resetTransactionFilters() {
     const searchEl = document.getElementById("filterSearch");
     if (searchEl) searchEl.value = "";
     renderTransactionsTable(_allTransactions, true);
+}
+
+
+
+// פונקציה שמסובבת (Toggle) את המצב בלחיצה על הכפתור
+function toggleDarkMode() {
+    // 1. קודם כל, מחליפים את המצב הויזואלי של המסך
+    document.body.classList.toggle('dark-mode');
+    
+    // 2. שומרים במשתנה את המצב הנוכחי (האם אנחנו עכשיו בדרק מוד או לא?)
+    const isDark = document.body.classList.contains('dark-mode');
+    
+    // 3. עדכון כפתור מסך ההתחברות (רק אימוג'י)
+    // הבדיקה if (loginBtn) מבטיחה שלא תהיה שגיאה אם אנחנו לא בדף ההתחברות
+    const loginBtn = document.getElementById('login-theme-btn');
+    if (loginBtn) {
+        loginBtn.innerText = isDark ? '☀️' : '🌙';
+    }
+    
+    // 4. עדכון כפתור תפריט הצד - Sidebar (אימוג'י + טקסט)
+    const sidebarBtn = document.getElementById('theme-toggle');
+    if (sidebarBtn) {
+        sidebarBtn.innerText = isDark ? '☀️ מצב בהיר' : '🌙 מצב כהה';
+    }
+    
+    // 5. שמירת הבחירה בזיכרון של הדפדפן כדי שהמעבר בין דפים יהיה חלק
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// פונקציית עזר לעדכון הטקסט והאייקון של הכפתור
+function updateThemeButtonText(isDark) {
+    const btn = document.getElementById('theme-toggle');
+    if (btn) {
+        btn.textContent = isDark ? '☀️ מצב בהיר' : '🌙 מצב כהה';
+    }
+}
+
+// פונקציה שמריצים בכל פעם שעמוד נטען כדי שהכפתור יציג את המצב הנכון
+function initThemeButton() {
+    const isDark = localStorage.getItem('theme') === 'dark';
+    updateThemeButtonText(isDark);
 }
