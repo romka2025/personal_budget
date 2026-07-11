@@ -6,15 +6,29 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+    
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 
-    <header class="topbar">
-        <h1>ניהול</h1>
-        <div>
-            <a href="dashboard.html">חזרה ל-Dashboard</a>
+    <div class="app-wrapper">
+
+    <aside class="sidebar">
+        <h2>סרגל הניווט</h2>
+        <nav>
+            <a href="dashboard.html">בית</a>
             <a href="transactions.html">כל התנועות</a>
+            <a href="manage.html">ניהול תקציבים ויעדים</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="theme-toggle" onclick="toggleDarkMode()">🌙 מצב כהה</button>
             <button onclick="logout()" class="btn-danger">התנתק</button>
         </div>
-    </header>
+    </aside>
+
+    <main class="main-content">
 
     <section>
         <h3>ניהול יעדים</h3>

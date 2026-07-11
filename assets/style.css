@@ -1,90 +1,158 @@
+:root {
+    --bg-body: #f5f7fa;
+    --bg-card: #ffffff;
+    --text-main: #222222;
+    --text-sub: #666666;
+    --border-color: #cccccc;
+    --border-light: #eeeeee;
+    --table-th-bg: #f0f2f5;
+    --input-bg: #ffffff;
+}
+
+body.dark-mode {
+    --bg-body: #121212;
+    --bg-card: #1e1e1e;
+    --text-main: #f5f5f5;
+    --text-sub: #b0b0b0;
+    --border-color: #444444;
+    --border-light: #333333;
+    --table-th-bg: #2a2a2a;
+    --input-bg: #2d2d2d;
+} 
+
 * { box-sizing: border-box; }
 
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    background: #f5f7fa;
-    color: #222;
+    background: var(--bg-body);
+    color: var(--text-main);
     margin: 0;
     padding: 0;
     direction: rtl;
+    transition: background 0.3s, color 0.3s;
 }
 
 h1, h2, h3, h4 { margin: 0.4em 0; }
 
-.container {
-    max-width: 360px;
-    margin: 60px auto;
-    padding: 24px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    text-align: center;
+/* ==========================================================================
+   עיצוב מסך ההתחברות וההרשמה
+   ========================================================================== */
+body:has(.container) {
+    background: linear-gradient(135deg, #fdf4f7 0%, #eef0ff 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.container input,
+/* התאמת הגרדיאנט למצב הכהה */
+body.dark-mode:has(.container) {
+    background: linear-gradient(135deg, #1a191f 0%, #252436 100%);
+}
+
+.container {
+    width: 100%;
+    max-width: 400px; /* קצת יותר רחב כדי לתת נשימה לתוכן */
+    padding: 48px 32px;
+    background: var(--bg-card);
+    border-radius: 24px; /* פינות הרבה יותר עגולות, בדיוק כמו בעיצוב */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); /* צל רך ורחב שמטמיע את הכרטיסייה ברקע */
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.4); /* מסגרת לבנה עדינה למראה זכוכיתי */
+}
+
+/* עיצוב שדות הקלט */
+.container input {
+    width: 100%;
+    padding: 14px 16px; /* שדות גבוהים יותר ומרווחים */
+    margin: 10px 0 16px 0;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-light);
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+/* האפקט הסגול כשלוחצים על שדה טקסט (כמו בתמונה) */
+.container input:focus {
+    outline: none;
+    border-color: #8c82fc; /* הצבע הסגול מהעיצוב שלך */
+    box-shadow: 0 0 0 4px rgba(140, 130, 252, 0.1); /* הילה עדינה סביב השדה */
+}
+
+/* כפתור ההתחברות השחור */
 .container button {
     width: 100%;
-    padding: 10px;
-    margin: 6px 0;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-.container button {
-    background: #4CAF50;
-    color: #fff;
+    padding: 16px;
+    margin: 16px 0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    background: #111111; /* שחור אלגנטי */
+    color: #ffffff;
     border: none;
     cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
 }
 
-.container button:hover { background: #43A047; }
+.container button:hover { 
+    background: #333333; 
+    transform: translateY(-2px); /* קפיצה קטנה ואלגנטית למעלה במעבר עכבר */
+}
+
+/* התאמת הכפתור השחור למצב הכהה (הופך ללבן כדי לבלוט) */
+body.dark-mode .container button {
+    background: #ffffff;
+    color: #111111;
+}
+
+body.dark-mode .container button:hover {
+    background: #e0e0e0;
+}
 
 .topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
+    background: var(--bg-card);
     padding: 12px 24px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .topbar a, .topbar button {
     margin-inline-start: 12px;
 }
 
+.topbar #todayDate {
+    color: var(--text-sub);
+    font-size: 13px;
+}
+
 section {
-    background: #fff;
+    background: var(--bg-card);
     margin: 16px 24px;
     padding: 16px 20px;
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: background 0.3s;
 }
 
-input, select, button {
+input, select {
     padding: 6px 10px;
     margin: 4px;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     font-size: 14px;
 }
 
-button {
-    background: #4CAF50;
-    color: #fff;
-    border: none;
-    cursor: pointer;
+input, select {
+    background: var(--input-bg);
+    color: var(--text-main);
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-button:hover { background: #43A047; }
-
-button.btn-danger {
-    background: #e53935;
-}
-
-button.btn-danger:hover {
-    background: #c62828;
-}
 
 table {
     width: 100%;
@@ -95,37 +163,17 @@ table {
 table th, table td {
     padding: 8px;
     text-align: center;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-table th { background: #f0f2f5; }
-
-.bar-bg {
-    background: #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    height: 14px;
-    margin: 4px 0;
+table th { 
+    background: var(--table-th-bg); 
+    color: var(--text-main);
 }
 
-.bar-fill {
-    height: 100%;
-    background: #4CAF50;
-    transition: width 200ms ease;
-}
-
-.goal-item, .budget-item {
-    border-top: 1px solid #eee;
-    padding: 10px 0;
-}
-
-.goal-item:first-child, .budget-item:first-child {
-    border-top: none;
-}
-
-.goal-desc {
-    color: #555;
-    font-size: 13px;
-    margin-top: 2px;
+table td {
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .cat-table {
@@ -137,18 +185,37 @@ table th { background: #f0f2f5; }
     width: 90%;
 }
 
-.topbar #todayDate {
-    color: #666;
-    font-size: 13px;
+.bar-bg {
+    background: var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 14px;
+    margin: 4px 0;
+    transition: background 0.3s;
 }
 
-.edit-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 6px;
+.bar-fill {
+    height: 100%;
+    background: #4CAF50;
+    transition: width 200ms ease;
 }
+
+.goal-item, .budget-item {
+    border-top: 1px solid var(--border-light);
+    padding: 10px 0;
+    transition: border-color 0.3s;
+}
+
+.goal-item:first-child, .budget-item:first-child {
+    border-top: none;
+}
+
+.goal-desc {
+    color: var(--text-sub);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
 
 .edit-row input {
     margin: 0;
@@ -156,7 +223,7 @@ table th { background: #f0f2f5; }
 
 /* Balance box */
 .balance-sub {
-    color: #666;
+    color: var(--text-sub);
     font-size: 13px;
     margin: 2px 0;
 }
@@ -179,15 +246,23 @@ table th { background: #f0f2f5; }
     border-radius: 8px;
 }
 
+body.dark-mode .alloc-row {
+    background: #1a2332; /* צבע מותאם למצב כהה שלא יסנוור */
+}
+
 .alloc-row label {
     font-size: 13px;
     font-weight: 600;
     color: #1565C0;
 }
 
+body.dark-mode .alloc-row label {
+    color: #64b5f6;
+}
+
 .alloc-hint {
     display: block;
-    color: #888;
+    color: var(--text-sub);
     font-size: 12px;
     margin-top: 4px;
 }
@@ -206,11 +281,521 @@ table th { background: #f0f2f5; }
     border-radius: 12px;
     margin-inline-start: 6px;
 }
-
-button.btn-success {
-    background: #1565C0;
+/* ==========================================================================
+   8. SIDEBAR & MAIN LAYOUT (שלד תפריט הצד ואזור התוכן)
+   ========================================================================== */
+/* עטיפת האפליקציה - שמה את התפריט והתוכן בשורה אחת */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh; /* מוודא שהאפליקציה תופסת לפחות את כל גובה המסך */
 }
 
+/* עיצוב תפריט הצד */
+.sidebar {
+    width: 250px; /* רוחב קבוע לתפריט */
+    background: var(--bg-card);
+    padding: 24px;
+    border-inline-end: 1px solid var(--border-color); /* פס הפרדה עדין בצד שמאל */
+    display: flex;
+    flex-direction: column; /* מסדר את הפריטים בתפריט אחד מתחת לשני */
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    margin-bottom: 32px;
+    font-size: 24px;
+    color: var(--text-main);
+}
+
+/* עיצוב הקישורים בתפריט */
+.sidebar nav a {
+    display: block;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: var(--text-sub);
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* אפקט מעבר עכבר על קישור בתפריט */
+.sidebar nav a:hover {
+    background: var(--border-light);
+    color: var(--text-main);
+}
+
+/* דוחף את אזור הכפתורים (מצב כהה/התנתק) לתחתית התפריט */
+.sidebar-footer {
+    margin-top: auto; 
+}
+
+.sidebar-footer button {
+    width: 100%; /* מכריח את שני הכפתורים להיות ברוחב זהה (תופסים את כל רוחב התפריט) */
+    padding: 12px; /* מוודא שגם הגובה שלהם יהיה שווה ונוח ללחיצה */
+    margin-bottom: 8px; /* שומר על רווח אחיד ביניהם */
+    border-radius: 8px; /* מוודא שהפינות נשארות מעוגלות יפה */
+    font-size: 14px;
+    font-weight: 600; /* נותן לטקסט משקל אחיד וברור */
+}
+
+/* אזור התוכן המרכזי תופס את שאר המסך שנותר */
+.main-content {
+    flex: 1; /* אומר לאזור התוכן "קח את כל המקום הפנוי" */
+    padding: 32px;
+    height: 100vh;
+    overflow-y: auto; /* מאפשר גלילה רק באזור התוכן אם יש הרבה טבלאות */
+}
+
+/* ==========================================================================
+ (עיצוב התוכן המרכזי - כרטיסיות ורשת)
+   ========================================================================== */
+/* עיצוב כפתור החלפת מצב כהה/בהיר בדף ההתחברות */
+.container button.theme-btn {
+    background: transparent;
+    color: var(--text-sub);
+    width: auto;
+    padding: 8px 16px;
+    margin-top: 16px;
+    font-size: 14px;
+    box-shadow: none;
+    border: 1px solid transparent;
+}
+
+.container button.theme-btn:hover {
+    background: var(--border-light);
+    color: var(--text-main);
+    transform: none; /* מבטל את הקפיצה שיש לכפתור השחור */
+}
+
+/* במצב כהה נרצה שהכפתור יהיה בולט קצת יותר */
+body.dark-mode .container button.theme-btn {
+    background: transparent;
+    color: #888888;
+}
+
+body.dark-mode .container button.theme-btn:hover {
+    background: #333333;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   עיצוב קוביות התקציר העליונות בדאשבורד (הוצאות, הכנסות, יתרה)
+   ========================================================================== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.summary-card {
+    background: var(--bg-card);
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card-icon {
+    font-size: 24px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: var(--muted);
+}
+
+.expense-icon { background: #ffebee; color: #d32f2f; }
+.income-icon { background: #e8f5e9; color: #388e3c; }
+.balance-icon { background: #e3f2fd; color: #1976d2; }
+
+.card-content h4 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-sub);
+    font-weight: 600;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.card-content .amount {
+    margin: 6px 0 2px 0;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.card-content .subtitle {
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+/* התאמה למסכים קטנים (טלפון נייד) - הופך לטור אחד */
+@media (max-width: 768px) {
+    .cards-grid {
+        grid-template-columns: 1fr; 
+    }
+}
+
+/* ==========================================================================
+   עיצוב אזור "הוסף תנועה" (טופס אופקי)
+   ========================================================================== */
+/* כותרת הסקשן */
+.section-header {
+    margin-bottom: 24px;
+}
+
+.section-header h3 {
+    margin-bottom: 4px;
+    border-bottom: none; /* מבטל את הקו התחתון שיש בשאר הכותרות */
+    padding-bottom: 0;
+    display: block;
+}
+
+.section-header .subtitle {
+    font-size: 14px;
+    color: var(--text-sub);
+}
+
+/* העטיפה של השדות - הופכת לשורה אופקית */
+.inline-form {
+    display: flex;
+    gap: 16px; /* הרווח בין השדות */
+    align-items: center; /* ממרכז את כולם לאותו גובה */
+    flex-wrap: wrap; /* מאפשר לשדות לרדת שורה במסכים קטנים כדי לא להימעך */
+}
+
+/* עיצוב אחיד לכל שדות הקלט והבחירה */
+.inline-form input,
+.inline-form select {
+    flex: 1; /* כל שדה יתפוס חלק שווה מהרוחב הפנוי */
+    min-width: 130px; /* רוחב מינימלי שלא יתכווצו מדי */
+    padding: 12px 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background-color: #f8f9fa; /* רקע אפרפר סופר עדין כמו בפיגמה */
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* אפקט פוקוס כשלוחצים על שדה להקליד בו */
+.inline-form input:focus,
+.inline-form select:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* עיצוב הכפתור השחור החדש ("+ הוסף") */
+.inline-form .btn-dark {
+    background-color: #1a1a1a; /* שחור-אפור כהה ואלגנטי */
+    color: #ffffff;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap; /* שומר על הטקסט של הכפתור בשורה אחת תמיד */
+    transition: background 0.2s, transform 0.1s;
+}
+
+.inline-form .btn-dark:hover {
+    background-color: #333333;
+    transform: translateY(-2px); /* הכפתור "קופץ" קצת למעלה בלחיצה */
+}
+
+/* ==========================================================================
+   עיצוב רשימת תנועות אחרונות 
+   ========================================================================== */
+
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+/* כל שורת תנועה */
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border-light, #f0f0f0);
+}
+
+/* מבטל את הקו התחתון בשורה האחרונה */
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+/* האזור הימני - אייקון וטקסטים */
+.tx-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* עיגול האייקון */
+.tx-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* צבעי האייקונים */
+.icon-income {
+    background-color: #e8f5e9; /* ירוק חיוור */
+    color: #388e3c;
+}
+
+.icon-expense {
+    background-color: #ffebee; /* אדום חיוור */
+    color: #d32f2f;
+}
+
+/* אזור הטקסט (כותרת ותת-כותרת) */
+.tx-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.tx-title {
+    font-weight: 600;
+    color: var(--text-main, #1a1a1a);
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.tx-subtitle {
+    color: var(--text-sub, #888888);
+    font-size: 13px;
+}
+
+/* האזור השמאלי - סכום וכפתורים */
+.tx-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* הסכום עצמו */
+.tx-amount {
+    font-weight: 700;
+    font-size: 16px;
+    display: inline-block;
+}
+
+/* צבעי הסכומים */
+.text-green { color: #388e3c; }
+.text-red { color: #d32f2f; }
+
+/* כפתור מחיקה חמוד (לעמוד ניהול) */
+.btn-delete-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-delete-icon:hover {
+    background: #ffebee;
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   התאמות של רשימת התנועות החדשה ל- Dark Mode
+   ========================================================================== */
+
+/* רקע הרשימה והמסגרות הפנימיות */
+body.dark-mode .transactions-list {
+    background: #1e1e1e; /* רקע כהה שמשתלב עם שאר הדאשבורד */
+}
+
+body.dark-mode .transaction-item {
+    border-bottom: 1px solid #333333; /* קו הפרדה כהה יותר */
+}
+
+/* צבעי הטקסט - כדי שלא יבלעו */
+body.dark-mode .tx-title {
+    color: #ffffff; /* כותרת לבנה בולטת */
+}
+
+body.dark-mode .tx-subtitle {
+    color: #aaaaaa; /* תת-כותרת אפורה בהירה */
+}
+
+/* התאמת צבעי האייקונים כדי שלא יסנוורו במצב כהה */
+body.dark-mode .icon-income {
+    background-color: #1b5e20; /* רקע ירוק כהה לאייקון */
+    color: #81c784; /* חץ ירוק בהיר */
+}
+
+body.dark-mode .icon-expense {
+    background-color: #b71c1c; /* רקע אדום כהה לאייקון */
+    color: #e57373; /* חץ אדום בהיר */
+}
+
+/* כפתור המחיקה שיהיה נוח בעין */
+body.dark-mode .btn-delete-icon:hover {
+    background: #333333;
+}
+/* ==========================================================================
+   התאמת שדות הזנה (Inputs) ותיבות בחירה (Selects) ל-Dark Mode
+   ========================================================================== */
+
+body.dark-mode input,
+body.dark-mode select {
+    background-color: #2a2a2a; /* רקע אפור כהה לשדות */
+    color: #ffffff; /* טקסט לבן ברור */
+    border: 1px solid #444444; /* מסגרת עדינה וכהה */
+}
+
+/* התאמת צבע טקסט העזר (Placeholder) - למשל "תיאור (אופציונלי)" */
+body.dark-mode input::placeholder {
+    color: #aaaaaa; 
+}
+
+/* הדגשת המסגרת כשלוחצים על השדה כדי לכתוב בו */
+body.dark-mode input:focus,
+body.dark-mode select:focus {
+    border-color: #888888;
+    outline: none;
+}
+
+/* ==========================================================================
+    עיצוב עמוד ניהול 
+   ========================================================================== */
+
+.goal-item, .budget-item, .categories-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-light, #f0f0f0);
+}
+
+/* 3. סידור פנימי גמיש למניעת בלאגן בעין */
+.edit-row, .alloc-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* 4. שדרוג כל הכפתורים באתר למראה מודרני */
+button {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #e5e7eb;
+}
+
+/* כפתורי פעולה חיובית (שמירה / עדכון) - ירוק מודרני */
+button[onclick*="update"], 
+button[onclick*="save"], 
+button[onclick*="allocate"], 
+button.btn-success {
+    background-color: #10b981;
+    color: #ffffff;
+}
+
+button[onclick*="update"]:hover, 
+button[onclick*="save"]:hover, 
+button[onclick*="allocate"]:hover, 
 button.btn-success:hover {
-    background: #0d47a1;
+    background-color: #059669;
+}
+
+/* כפתורי מחיקה - רקע אדום חלש וטקסט אדום מודגש */
+button.btn-danger, 
+button[onclick*="delete"] {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+button.btn-danger:hover, 
+button[onclick*="delete"]:hover {
+    background-color: #fca5a5;
+    color: #b91c1c;
+}
+
+/* 5. התאמות ל- Dark Mode עבור הכרטיסיות החדשות */
+body.dark-mode .goal-item, 
+body.dark-mode .budget-item, 
+body.dark-mode .categories-container {
+    background: #1e1e1e;
+    border-color: #333333;
+    box-shadow: none;
+}
+
+body.dark-mode button {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+body.dark-mode button:hover {
+    background-color: #444444;
+}
+
+/* ==========================================================================
+  (Welcome) בדאשבורד
+   ========================================================================== */
+.dashboard-greeting {
+    margin-bottom: 24px;
+}
+
+.dashboard-greeting h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+}
+
+.dashboard-greeting p {
+    font-size: 15px;
+    color: #888888;
+    margin: 0;
+}
+
+/* התאמה חלקה למצב הכהה */
+body.dark-mode .dashboard-greeting h1 {
+    color: #ffffff;
+}
+
+body.dark-mode .dashboard-greeting p {
+    color: #aaaaaa;
 }
