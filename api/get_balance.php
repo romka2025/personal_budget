@@ -9,14 +9,18 @@ if ($user_id <= 0) {
     exit;
 }
 
-// Income / expense totals
+// Income / expense totals.
+// חייב להתעלם משורות סטורנו (is_storno = 1) וגם מהתנועות המקוריות שבוטלו
+// (יש להן שורת סטורנו שמצביעה עליהן) — אחרת מחיקת תנועה נספרת פעמיים:
+// פעם כהוצאה המקורית ופעם כהכנסה ההפוכה (הסטורנו).
 $sql = "SELECT
-          COALESCE(SUM(CASE WHEN type='income'  THEN amount END), 0) AS income,
-          COALESCE(SUM(CASE WHEN type='expense' THEN amount END), 0) AS expense,
-          COALESCE(SUM(CASE WHEN type='income'  THEN amount ELSE 0 END)
-                 - SUM(CASE WHEN type='expense' THEN amount ELSE 0 END), 0) AS balance
-        FROM transactions
-        WHERE user_id = ?";
+          COALESCE(SUM(CASE WHEN t.type='income'  THEN t.amount END), 0) AS income,
+          COALESCE(SUM(CASE WHEN t.type='expense' THEN t.amount END), 0) AS expense,
+          COALESCE(SUM(CASE WHEN t.type='income'  THEN t.amount ELSE 0 END)
+                 - SUM(CASE WHEN t.type='expense' THEN t.amount ELSE 0 END), 0) AS balance
+        FROM transactions t
+        LEFT JOIN transactions s ON s.storno_ref = t.transaction_id AND s.user_id = t.user_id
+        WHERE t.user_id = ? AND t.is_storno = 0 AND s.storno_ref IS NULL";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);

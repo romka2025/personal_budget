@@ -216,7 +216,8 @@ function loadBalance(userId) {
 function loadTransactions(userId) {
     fetch(`${API}/get_transactions.php?user_id=${userId}`)
         .then(res => res.json())
-        .then(data => renderTransactionsTable(data, /* withDelete */ false))
+        // בדאשבורד אין תיבת "הצג תנועות מחוקות", אז תמיד מוסתרות כברירת מחדל.
+        .then(data => renderTransactionsTable(data.filter(t => !t.is_cancelled), /* withDelete */ false))
         .catch(err => console.error(err));
 }
 
@@ -235,34 +236,36 @@ function renderTransactionsTable(data, withDelete) {
     let html = '<div class="transactions-list">';
     
     displayData.forEach(t => {
-        const isIncome = t.type === 'income';
-        
+        const isIncome    = t.type === 'income';
+        const isCancelled = !!t.is_cancelled;
+
         // הגדרות עיצוב לפי סוג התנועה
         const iconClass = isIncome ? 'icon-income' : 'icon-expense';
         const iconSymbol = isIncome ? '↗' : '↘'; // חצים כמו בעיצוב
         const sign = isIncome ? '+' : '-';
         const amountColor = isIncome ? 'text-green' : 'text-red';
-        
+
         // סידור התאריך לפורמט ישראלי (DD/MM/YYYY)
         const dateParts = t.date.split('-');
         const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : t.date;
-        
+
         // כותרת - אם אין תיאור, נציג את שם הקטגוריה
         const title = t.description ? escapeHtml(t.description) : escapeHtml(t.category || 'תנועה');
         const categoryName = escapeHtml(t.category || 'כללי');
+        const cancelledBadge = isCancelled ? `<span class="badge-cancelled">תנועה נמחקה</span>` : "";
 
-        // כפתור מחיקה (יוצג רק בעמוד כל התנועות, לא בדאשבורד)
-        const actionCell = withDelete
+        // כפתור מחיקה (יוצג רק בעמוד כל התנועות, ולא לתנועה שכבר בוטלה)
+        const actionCell = (withDelete && !isCancelled)
             ? `<button class="btn-delete-icon" onclick="deleteTransaction(${t.transaction_id})" title="מחק תנועה">🗑️</button>`
             : "";
 
         // בניית השורה
         html += `
-            <div class="transaction-item">
+            <div class="transaction-item${isCancelled ? ' transaction-cancelled' : ''}">
                 <div class="tx-right">
                     <div class="tx-icon ${iconClass}">${iconSymbol}</div>
                     <div class="tx-details">
-                        <span class="tx-title">${title}</span>
+                        <span class="tx-title">${title} ${cancelledBadge}</span>
                         <span class="tx-subtitle">${categoryName} • ${formattedDate}</span>
                     </div>
                 </div>
@@ -868,9 +871,9 @@ function initTransactionsPage() {
         .then(res => res.json())
         .then(data => {
             _allTransactions = data;
-            renderTransactionsTable(data, true);
+            renderTransactionsTable(filterTransactions(data), true);
         });
-    initThemeButton();    
+    initThemeButton();
 }
 
 function applyTransactionFilters() {
@@ -886,14 +889,18 @@ function applyTransactionFilters() {
 }
 
 function filterTransactions(data) {
-    const type     = document.getElementById("filterType").value;
-    const catId    = document.getElementById("filterCategory").value;
-    const fromDate = document.getElementById("filterFrom").value;
-    const toDate   = document.getElementById("filterTo").value;
-    const searchEl = document.getElementById("filterSearch");
-    const search   = searchEl ? searchEl.value.trim().toLowerCase() : "";
+    const type          = document.getElementById("filterType").value;
+    const catId         = document.getElementById("filterCategory").value;
+    const fromDate      = document.getElementById("filterFrom").value;
+    const toDate        = document.getElementById("filterTo").value;
+    const searchEl      = document.getElementById("filterSearch");
+    const search        = searchEl ? searchEl.value.trim().toLowerCase() : "";
+    const showCancelledEl = document.getElementById("filterShowCancelled");
+    const showCancelled = showCancelledEl ? showCancelledEl.checked : false;
 
     return data.filter(t => {
+        // כברירת מחדל תנועות מחוקות (סטורנו) מוסתרות, אלא אם סומן "הצג תנועות מחוקות".
+        if (!showCancelled && t.is_cancelled)                 return false;
         if (type && t.type !== type)                          return false;
         if (catId && String(t.category_id) !== String(catId)) return false;
         if (fromDate && t.date < fromDate)                    return false;
@@ -913,7 +920,9 @@ function resetTransactionFilters() {
     document.getElementById("filterTo").value       = "";
     const searchEl = document.getElementById("filterSearch");
     if (searchEl) searchEl.value = "";
-    renderTransactionsTable(_allTransactions, true);
+    const showCancelledEl = document.getElementById("filterShowCancelled");
+    if (showCancelledEl) showCancelledEl.checked = false;
+    renderTransactionsTable(filterTransactions(_allTransactions), true);
 }
 
 

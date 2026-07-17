@@ -649,6 +649,28 @@ body.dark-mode .container button.theme-btn:hover {
 .text-green { color: #388e3c; }
 .text-red { color: #d32f2f; }
 
+/* שורת תנועה שבוטלה (סטורנו) */
+.transaction-cancelled {
+    opacity: 0.55;
+}
+
+.transaction-cancelled .tx-title,
+.transaction-cancelled .tx-amount {
+    text-decoration: line-through;
+}
+
+.badge-cancelled {
+    display: inline-block;
+    margin-inline-start: 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    background-color: #eeeeee;
+    color: #757575;
+}
+
 /* כפתור מחיקה חמוד (לעמוד ניהול) */
 .btn-delete-icon {
     background: none;
@@ -701,6 +723,11 @@ body.dark-mode .icon-expense {
 /* כפתור המחיקה שיהיה נוח בעין */
 body.dark-mode .btn-delete-icon:hover {
     background: #333333;
+}
+
+body.dark-mode .badge-cancelled {
+    background-color: #333333;
+    color: #aaaaaa;
 }
 /* ==========================================================================
    התאמת שדות הזנה (Inputs) ותיבות בחירה (Selects) ל-Dark Mode
