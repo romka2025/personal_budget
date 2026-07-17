@@ -445,7 +445,46 @@ body.dark-mode .container button.theme-btn:hover {
 /* התאמה למסכים קטנים (טלפון נייד) - הופך לטור אחד */
 @media (max-width: 768px) {
     .cards-grid {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
+    }
+
+    /* מבטל את הפריסה הצדדית (sidebar + content בשורה) ומעביר לטור אחד */
+    .app-wrapper {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    /* התפריט הופך לרוחב מלא במקום 250px קבוע, וללא גובה מסך מלא */
+    .sidebar {
+        width: 100%;
+        border-inline-end: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px;
+    }
+
+    /* מבטל את הגובה הקבוע (100vh) שגרם לתוכן להימתח מעבר למסך */
+    .main-content {
+        height: auto;
+        overflow-y: visible;
+        padding: 16px;
+    }
+
+    /* טופס ההוספה וטבלאות נדחסים לרוחב המסך במקום לגלוש הצידה */
+    .inline-form input,
+    .inline-form select {
+        min-width: 0;
+        flex-basis: 100%;
+    }
+
+    section {
+        margin: 12px 0;
+        padding: 12px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 }
 
