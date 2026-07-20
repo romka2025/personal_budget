@@ -145,9 +145,6 @@ input, select {
     border-radius: 6px;
     border: 1px solid var(--border-color);
     font-size: 14px;
-}
-
-input, select {
     background: var(--input-bg);
     color: var(--text-main);
     transition: background 0.3s, color 0.3s, border-color 0.3s;
@@ -200,25 +197,10 @@ table td {
     transition: width 200ms ease;
 }
 
-.goal-item, .budget-item {
-    border-top: 1px solid var(--border-light);
-    padding: 10px 0;
-    transition: border-color 0.3s;
-}
-
-.goal-item:first-child, .budget-item:first-child {
-    border-top: none;
-}
-
 .goal-desc {
     color: var(--text-sub);
     font-size: 13px;
     margin-top: 2px;
-}
-
-
-.edit-row input {
-    margin: 0;
 }
 
 /* Balance box */
@@ -232,18 +214,6 @@ table td {
     color: #1565C0;
     font-size: 13px;
     margin: 2px 0;
-}
-
-/* Allocation row inside a goal */
-.alloc-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-    padding: 8px;
-    background: #f0f7ff;
-    border-radius: 8px;
 }
 
 body.dark-mode .alloc-row {
@@ -864,4 +834,43 @@ body.dark-mode .dashboard-greeting h1 {
 
 body.dark-mode .dashboard-greeting p {
     color: #aaaaaa;
+}
+
+.split-screen-wrapper {
+    display: flex;
+    align-items: center; /* ממרכז את שני הצדדים לאותו גובה */
+    justify-content: center;
+    gap: 60px; /* רווח בין הטקסט לטופס */
+    max-width: 1000px;
+    width: 90%;
+    flex-direction: row; /* מכריח תצוגה זה לצד זה במסך מחשב */
+}
+
+.welcome-text {
+    flex: 1; /* לוקח חצי מהמקום הפנוי */
+    text-align: right; /* יישור הטקסט לימין */
+}
+
+.welcome-text h1 {
+    font-size: 50px;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.welcome-text p {
+    font-size: 20px;
+    color: var(--text-sub);
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .split-screen-wrapper {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .welcome-text {
+        text-align: center; 
+    }
 }
