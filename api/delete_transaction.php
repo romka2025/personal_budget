@@ -18,11 +18,15 @@ if ($user_id <= 0 || $transaction_id <= 0) {
     exit;
 }
 
-// שלוף את הרשומה המקורית (רק רשומות שאינן סטורנו עצמן)
+// שלוף את הרשומה המקורית (רק רשומות שאינן סטורנו עצמן, ושעדיין לא בוטלו)
 $stmt = $conn->prepare(
-    "SELECT amount, type, category_id, description
-     FROM transactions
-     WHERE transaction_id = ? AND user_id = ? AND is_storno = 0"
+    "SELECT t.amount, t.type, t.category_id, t.description
+     FROM transactions t
+     WHERE t.transaction_id = ? AND t.user_id = ? AND t.is_storno = 0
+       AND NOT EXISTS (
+           SELECT 1 FROM transactions s
+           WHERE s.storno_ref = t.transaction_id AND s.user_id = t.user_id
+       )"
 );
 $stmt->bind_param("ii", $transaction_id, $user_id);
 $stmt->execute();

@@ -145,9 +145,6 @@ input, select {
     border-radius: 6px;
     border: 1px solid var(--border-color);
     font-size: 14px;
-}
-
-input, select {
     background: var(--input-bg);
     color: var(--text-main);
     transition: background 0.3s, color 0.3s, border-color 0.3s;
@@ -200,25 +197,10 @@ table td {
     transition: width 200ms ease;
 }
 
-.goal-item, .budget-item {
-    border-top: 1px solid var(--border-light);
-    padding: 10px 0;
-    transition: border-color 0.3s;
-}
-
-.goal-item:first-child, .budget-item:first-child {
-    border-top: none;
-}
-
 .goal-desc {
     color: var(--text-sub);
     font-size: 13px;
     margin-top: 2px;
-}
-
-
-.edit-row input {
-    margin: 0;
 }
 
 /* Balance box */
@@ -232,18 +214,6 @@ table td {
     color: #1565C0;
     font-size: 13px;
     margin: 2px 0;
-}
-
-/* Allocation row inside a goal */
-.alloc-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-    padding: 8px;
-    background: #f0f7ff;
-    border-radius: 8px;
 }
 
 body.dark-mode .alloc-row {
@@ -445,7 +415,46 @@ body.dark-mode .container button.theme-btn:hover {
 /* התאמה למסכים קטנים (טלפון נייד) - הופך לטור אחד */
 @media (max-width: 768px) {
     .cards-grid {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
+    }
+
+    /* מבטל את הפריסה הצדדית (sidebar + content בשורה) ומעביר לטור אחד */
+    .app-wrapper {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    /* התפריט הופך לרוחב מלא במקום 250px קבוע, וללא גובה מסך מלא */
+    .sidebar {
+        width: 100%;
+        border-inline-end: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px;
+    }
+
+    /* מבטל את הגובה הקבוע (100vh) שגרם לתוכן להימתח מעבר למסך */
+    .main-content {
+        height: auto;
+        overflow-y: visible;
+        padding: 16px;
+    }
+
+    /* טופס ההוספה וטבלאות נדחסים לרוחב המסך במקום לגלוש הצידה */
+    .inline-form input,
+    .inline-form select {
+        min-width: 0;
+        flex-basis: 100%;
+    }
+
+    section {
+        margin: 12px 0;
+        padding: 12px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 }
 
@@ -610,6 +619,28 @@ body.dark-mode .container button.theme-btn:hover {
 .text-green { color: #388e3c; }
 .text-red { color: #d32f2f; }
 
+/* שורת תנועה שבוטלה (סטורנו) */
+.transaction-cancelled {
+    opacity: 0.55;
+}
+
+.transaction-cancelled .tx-title,
+.transaction-cancelled .tx-amount {
+    text-decoration: line-through;
+}
+
+.badge-cancelled {
+    display: inline-block;
+    margin-inline-start: 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    background-color: #eeeeee;
+    color: #757575;
+}
+
 /* כפתור מחיקה חמוד (לעמוד ניהול) */
 .btn-delete-icon {
     background: none;
@@ -662,6 +693,11 @@ body.dark-mode .icon-expense {
 /* כפתור המחיקה שיהיה נוח בעין */
 body.dark-mode .btn-delete-icon:hover {
     background: #333333;
+}
+
+body.dark-mode .badge-cancelled {
+    background-color: #333333;
+    color: #aaaaaa;
 }
 /* ==========================================================================
    התאמת שדות הזנה (Inputs) ותיבות בחירה (Selects) ל-Dark Mode
@@ -798,4 +834,43 @@ body.dark-mode .dashboard-greeting h1 {
 
 body.dark-mode .dashboard-greeting p {
     color: #aaaaaa;
+}
+
+.split-screen-wrapper {
+    display: flex;
+    align-items: center; /* ממרכז את שני הצדדים לאותו גובה */
+    justify-content: center;
+    gap: 60px; /* רווח בין הטקסט לטופס */
+    max-width: 1000px;
+    width: 90%;
+    flex-direction: row; /* מכריח תצוגה זה לצד זה במסך מחשב */
+}
+
+.welcome-text {
+    flex: 1; /* לוקח חצי מהמקום הפנוי */
+    text-align: right; /* יישור הטקסט לימין */
+}
+
+.welcome-text h1 {
+    font-size: 50px;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.welcome-text p {
+    font-size: 20px;
+    color: var(--text-sub);
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .split-screen-wrapper {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .welcome-text {
+        text-align: center; 
+    }
 }

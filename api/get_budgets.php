@@ -22,8 +22,13 @@ $sql = "
             WHERE t.user_id     = b.user_id
               AND t.category_id = b.category_id
               AND t.type        = 'expense'
+              AND t.is_storno   = 0
               AND YEAR(t.date)  = YEAR(CURDATE())
               AND MONTH(t.date) = MONTH(CURDATE())
+              AND NOT EXISTS (
+                  SELECT 1 FROM transactions s
+                  WHERE s.storno_ref = t.transaction_id AND s.user_id = t.user_id
+              )
         ), 0) AS spent
     FROM budgets b
     LEFT JOIN categories c ON c.category_id = b.category_id
